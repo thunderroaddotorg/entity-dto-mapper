@@ -3,9 +3,11 @@ package be.bvl.entitydtomapping;
 import dto.ClassADTO;
 import dto.ClassBDTO;
 import dto.ClassCDTO;
+import dto.EffectiveClassEDTO;
 import entity.ClassA;
 import entity.ClassB;
 import entity.ClassC;
+import entity.EffectiveClassE;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,6 +24,8 @@ public class FromDtoMapperTest {
     private static final long CLASS_B_ID = 2L;
     private static final long CLASS_C_ID = 3L;
     private static final String CLASS_C_NAME = "classC Name";
+    private static final long CLASS_E_ID = 5L;
+    private static final String CLASS_E_NAME = "classE Name";
 
     @Test
     public void fromDtoSimple() {
@@ -60,6 +64,16 @@ public class FromDtoMapperTest {
         dtoC.fromDto(dtoC, entity);
 
         Assert.assertEquals(expectedEntityC, entity);
+    }
+
+    @Test
+    public void fromDtoMapperExtendsAbstract() {
+        EffectiveClassE expectedEntity = new EffectiveClassE(CLASS_E_ID, CLASS_E_NAME);
+        EffectiveClassEDTO effectiveClassEDTO = new EffectiveClassEDTO(CLASS_E_ID, CLASS_E_NAME);
+
+        EffectiveClassE entity = new EffectiveClassE();
+        effectiveClassEDTO.fromDto(effectiveClassEDTO, entity);
+        Assert.assertEquals(expectedEntity, entity);
     }
 
 }

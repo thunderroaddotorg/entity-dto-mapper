@@ -3,9 +3,11 @@ package be.bvl.entitydtomapping;
 import dto.ClassADTO;
 import dto.ClassBDTO;
 import dto.ClassCDTO;
+import dto.EffectiveClassEDTO;
 import entity.ClassA;
 import entity.ClassB;
 import entity.ClassC;
+import entity.EffectiveClassE;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,6 +24,8 @@ public class ToDtoMapperTest {
     private static final long CLASS_B_ID = 2L;
     private static final long CLASS_C_ID = 3L;
     private static final String CLASS_C_NAME = "classC Name";
+    private static final long CLASS_E_ID = 5L;
+    private static final String CLASS_E_NAME = "classE Name";
 
     @Test
     public void toDtoSimple() {
@@ -35,7 +39,7 @@ public class ToDtoMapperTest {
     }
 
     @Test
-    public void toDoMemberToDoMapperOneLevel() {
+    public void toDtoMapperOneLevel() {
         ClassA entityA = new ClassA(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
         ClassB entityB = new ClassB(CLASS_B_ID, entityA);
         ClassADTO expectedDtoA = new ClassADTO(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
@@ -48,7 +52,7 @@ public class ToDtoMapperTest {
     }
 
     @Test
-    public void toDoMemberToDoMapperOTwoLevels() {
+    public void toDtoMapperOTwoLevels() {
         ClassA entityA = new ClassA(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
         ClassB entityB = new ClassB(CLASS_B_ID, entityA);
         ClassC entityC = new ClassC(CLASS_C_ID, CLASS_C_NAME, entityB);
@@ -60,6 +64,16 @@ public class ToDtoMapperTest {
         entityC.toDto(entityC, dto);
 
         Assert.assertEquals(expectedDtoC, dto);
+    }
+
+    @Test
+    public void toDtoMapperExtendsAbstract() {
+        EffectiveClassE entity = new EffectiveClassE(CLASS_E_ID, CLASS_E_NAME);
+        EffectiveClassEDTO expectedEffectiveClassEDTO = new EffectiveClassEDTO(CLASS_E_ID, CLASS_E_NAME);
+
+        EffectiveClassEDTO dto = new EffectiveClassEDTO();
+        entity.toDto(entity, dto);
+        Assert.assertEquals(expectedEffectiveClassEDTO, dto);
     }
 
 }
