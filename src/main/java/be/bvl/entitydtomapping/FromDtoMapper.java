@@ -13,10 +13,25 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Interface to add conversion method from a DTO bean of type DTO to a entity bean of type T.
+ * @param <T>
+ * @param <DTO>
+ *
+ * @author Van Lommel Bart
+ */
 public interface FromDtoMapper<T, DTO> {
 
     Logger logger = LoggerFactory.getLogger(FromDtoMapper.class);
 
+    /**
+     * Conversion method to convert the DTO bean into the entity bean that represents it.
+     * Members that implement the FromDtoMapper interface will also be converted.
+     * Members that are Collections of type java.util.List or java.util.Set will be converted
+     * in a java.uti.List or java.util.Set of the corresponding entity bean types.
+     * @param dto the DTO bean that needs to be converted. (Is at the same time the calling object)
+     * @param entity the entity bean that the entity will be converted into. (needs to be instantiated before)
+     */
     default void fromDto(DTO dto, T entity) {
         BeanUtils.copyProperties(dto, entity);
         for (Field fieldDto : Arrays.stream(dto.getClass().getDeclaredFields())
