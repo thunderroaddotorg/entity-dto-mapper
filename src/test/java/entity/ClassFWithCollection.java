@@ -4,31 +4,43 @@ import be.bvl.entitydtomapping.ToDtoMapper;
 import dto.ClassFWithCollectionDTO;
 
 import java.util.List;
+import java.util.Set;
 
 public class ClassFWithCollection extends AbstractClassD implements ToDtoMapper<ClassFWithCollection, ClassFWithCollectionDTO> {
 
-    private List<ClassA> members;
+    private List<ClassA> membersList;
+    private Set<ClassA> membersSet;
 
     public ClassFWithCollection() {
     }
 
-    public ClassFWithCollection(long id, List<ClassA> members) {
+    public ClassFWithCollection(long id, List<ClassA> membersList, Set<ClassA> membersSet) {
         super(id);
-        this.members = members;
+        this.membersList = membersList;
+        this.membersSet = membersSet;
     }
 
-    public List<ClassA> getMembers() {
-        return members;
+    public List<ClassA> getMembersList() {
+        return membersList;
     }
 
-    public void setMembers(List<ClassA> members) {
-        this.members = members;
+    public void setMembersList(List<ClassA> membersList) {
+        this.membersList = membersList;
+    }
+
+    public Set<ClassA> getMembersSet() {
+        return membersSet;
+    }
+
+    public void setMembersSet(Set<ClassA> membersSet) {
+        this.membersSet = membersSet;
     }
 
     @Override
     public String toString() {
         return "ClassFWithCollection{" +
-                "members=" + members +
+                "membersList=" + membersList +
+                ", membersSet=" + membersSet +
                 ", id=" + getId() +
                 '}';
     }
@@ -41,14 +53,14 @@ public class ClassFWithCollection extends AbstractClassD implements ToDtoMapper<
 
         ClassFWithCollection that = (ClassFWithCollection) o;
 
-        return getMembers().equals(that.getMembers());
+        return getMembersList().equals(that.getMembersList()) && getMembersSet().equals(that.getMembersSet());
 
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + getMembers().hashCode();
+        result = 31 * result + getMembersList().hashCode() + getMembersSet().hashCode();
         return result;
     }
 }

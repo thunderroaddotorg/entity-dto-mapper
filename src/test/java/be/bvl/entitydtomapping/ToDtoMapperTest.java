@@ -9,13 +9,18 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 
 public class ToDtoMapperTest {
 
-    private static final long CLASS_A_ID = 1L;
-    private static final String CLASS_A_NAME = "classA Name";
-    private static final Date CLASS_A_DATE = Date.from(LocalDate.of(2000, 10, 10).atStartOfDay().toInstant(ZoneOffset.UTC));
-    private static final Object CLASS_A_OBJECT = new Object();
+    private static final long CLASS_A1_ID = 1L;
+    private static final String CLASS_A1_NAME = "classA1 Name";
+    private static final Date CLASS_A1_DATE = Date.from(LocalDate.of(2000, 10, 10).atStartOfDay().toInstant(ZoneOffset.UTC));
+    private static final Object CLASS_A1_OBJECT = new Object();
+    private static final long CLASS_A2_ID = 10L;
+    private static final String CLASS_A2_NAME = "classA2 Name";
+    private static final Date CLASS_A2_DATE = Date.from(LocalDate.of(2001, 11, 11).atStartOfDay().toInstant(ZoneOffset.UTC));
+    private static final Object CLASS_A2_OBJECT = new Object();
     private static final long CLASS_B_ID = 2L;
     private static final long CLASS_C_ID = 3L;
     private static final String CLASS_C_NAME = "classC Name";
@@ -25,8 +30,8 @@ public class ToDtoMapperTest {
 
     @Test
     public void toDtoSimple() {
-        ClassA entity = new ClassA(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
-        ClassADTO expectedDto = new ClassADTO(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
+        ClassA entity = new ClassA(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
+        ClassADTO expectedDto = new ClassADTO(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
 
         ClassADTO dto = new ClassADTO();
         entity.toDto(entity, dto);
@@ -36,9 +41,9 @@ public class ToDtoMapperTest {
 
     @Test
     public void toDtoMapperOneLevel() {
-        ClassA entityA = new ClassA(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
+        ClassA entityA = new ClassA(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
         ClassB entityB = new ClassB(CLASS_B_ID, entityA);
-        ClassADTO expectedDtoA = new ClassADTO(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
+        ClassADTO expectedDtoA = new ClassADTO(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
         ClassBDTO expectedDtoB = new ClassBDTO(CLASS_B_ID, expectedDtoA);
 
         ClassBDTO dto = new ClassBDTO();
@@ -49,10 +54,10 @@ public class ToDtoMapperTest {
 
     @Test
     public void toDtoMapperOTwoLevels() {
-        ClassA entityA = new ClassA(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
+        ClassA entityA = new ClassA(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
         ClassB entityB = new ClassB(CLASS_B_ID, entityA);
         ClassC entityC = new ClassC(CLASS_C_ID, CLASS_C_NAME, entityB);
-        ClassADTO expectedDtoA = new ClassADTO(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
+        ClassADTO expectedDtoA = new ClassADTO(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
         ClassBDTO expectedDtoB = new ClassBDTO(CLASS_B_ID, expectedDtoA);
         ClassCDTO expectedDtoC = new ClassCDTO(CLASS_C_ID, CLASS_C_NAME, expectedDtoB);
 
@@ -75,11 +80,19 @@ public class ToDtoMapperTest {
     @Test
     public void toDtoMapperWithCollection() {
 
-        ClassA entityA = new ClassA(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
-        ClassADTO expectedDtoA = new ClassADTO(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
+        ClassA entityA1 = new ClassA(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
+        ClassADTO expectedDtoA1 = new ClassADTO(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
+        ClassA entityA2 = new ClassA(CLASS_A2_ID, CLASS_A2_NAME, CLASS_A2_DATE, CLASS_A2_OBJECT);
+        ClassADTO expectedDtoA2 = new ClassADTO(CLASS_A2_ID, CLASS_A2_NAME, CLASS_A2_DATE, CLASS_A2_OBJECT);
 
-        ClassFWithCollection entity = new ClassFWithCollection(CLASS_F_ID, Arrays.asList(entityA));
-        ClassFWithCollectionDTO expectedDto = new ClassFWithCollectionDTO(CLASS_F_ID, Arrays.asList(expectedDtoA));
+        ClassFWithCollection entity =
+                new ClassFWithCollection(CLASS_F_ID,
+                        Arrays.asList(entityA1, entityA2),
+                        new HashSet<>(Arrays.asList(entityA1, entityA2)));
+        ClassFWithCollectionDTO expectedDto =
+                new ClassFWithCollectionDTO(CLASS_F_ID,
+                        Arrays.asList(expectedDtoA1, expectedDtoA2),
+                        new HashSet<>(Arrays.asList(expectedDtoA1, expectedDtoA2)));
 
         ClassFWithCollectionDTO dto = new ClassFWithCollectionDTO();
         entity.toDto(entity, dto);
