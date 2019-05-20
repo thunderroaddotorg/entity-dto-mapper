@@ -7,9 +7,9 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
+
+import static org.junit.Assert.fail;
 
 public class ToDtoMapperTest {
 
@@ -97,6 +97,27 @@ public class ToDtoMapperTest {
         ClassFWithCollectionDTO dto = new ClassFWithCollectionDTO();
         entity.toDto(entity, dto);
         Assert.assertEquals(expectedDto, dto);
+    }
+
+    @Test
+    public void toDtoMapperWithInvalidCollection() {
+
+        ClassA entityA1 = new ClassA(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
+        ClassA entityA2 = new ClassA(CLASS_A2_ID, CLASS_A2_NAME, CLASS_A2_DATE, CLASS_A2_OBJECT);
+
+        Queue<ClassA> classAVector = new LinkedList<>();
+
+        classAVector.add(entityA1);
+        classAVector.add(entityA2);
+        ClassFWithInvalidCollection entity = new ClassFWithInvalidCollection(CLASS_F_ID, classAVector);
+
+        ClassFWithInvalidCollectionDTO dto = new ClassFWithInvalidCollectionDTO();
+        try {
+            entity.toDto(entity, dto);
+            fail("Test should throw UnsupportedOperationException with message: \"<class name> holds a member that is a java.util.Collection other than java.util.List or java.util.Set.\"");
+        } catch (UnsupportedOperationException e) {
+            Assert.assertEquals("entity.ClassFWithInvalidCollection holds a member that is a java.util.Collection other than java.util.List or java.util.Set.", e.getMessage());
+        }
     }
 
 }

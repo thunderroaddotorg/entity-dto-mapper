@@ -91,10 +91,9 @@ public interface ToDtoMapper<T, DTO> {
                         setTarget.add(newInstance);
                     }
                     pdSet.getWriteMethod().invoke(dto, setTarget);
-//                } else if (Map.class.equals(fieldDto.getType()) && Map.class.equals(field.getType())) {
-//                    logger.debug("Map entity");
-                } else throw new UnsupportedOperationException();
-
+                } else {
+                    throw new UnsupportedOperationException(this.getClass().getTypeName() + " holds a member that is a java.util.Collection other than java.util.List or java.util.Set.");
+                }
             } catch (IntrospectionException
                     | IllegalAccessException
                     | IllegalArgumentException
