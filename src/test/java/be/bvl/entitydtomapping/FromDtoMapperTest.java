@@ -1,18 +1,13 @@
 package be.bvl.entitydtomapping;
 
-import dto.ClassADTO;
-import dto.ClassBDTO;
-import dto.ClassCDTO;
-import dto.EffectiveClassEDTO;
-import entity.ClassA;
-import entity.ClassB;
-import entity.ClassC;
-import entity.EffectiveClassE;
+import dto.*;
+import entity.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Date;
 
 public class FromDtoMapperTest {
@@ -26,6 +21,7 @@ public class FromDtoMapperTest {
     private static final String CLASS_C_NAME = "classC Name";
     private static final long CLASS_E_ID = 5L;
     private static final String CLASS_E_NAME = "classE Name";
+    private static final long CLASS_F_ID = 6L;
 
     @Test
     public void fromDtoSimple() {
@@ -73,6 +69,20 @@ public class FromDtoMapperTest {
 
         EffectiveClassE entity = new EffectiveClassE();
         effectiveClassEDTO.fromDto(effectiveClassEDTO, entity);
+        Assert.assertEquals(expectedEntity, entity);
+    }
+
+    @Test
+    public void toDtoMapperWithCollection() {
+
+        ClassA expectedEntityA = new ClassA(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
+        ClassADTO dtoA = new ClassADTO(CLASS_A_ID, CLASS_A_NAME, CLASS_A_DATE, CLASS_A_OBJECT);
+
+        ClassFWithCollection expectedEntity = new ClassFWithCollection(CLASS_F_ID, Arrays.asList(expectedEntityA));
+        ClassFWithCollectionDTO dto = new ClassFWithCollectionDTO(CLASS_F_ID, Arrays.asList(dtoA));
+
+        ClassFWithCollection entity = new ClassFWithCollection();
+        dto.fromDto(dto, entity);
         Assert.assertEquals(expectedEntity, entity);
     }
 

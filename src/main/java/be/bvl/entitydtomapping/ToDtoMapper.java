@@ -8,6 +8,8 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,6 @@ public interface ToDtoMapper<T, DTO> {
                         .contains(ToDtoMapper.class)).collect(Collectors.toList())) {
 
             try {
-                Field fieldDto = dto.getClass().getDeclaredField(field.getName());
                 PropertyDescriptor pdGet = new PropertyDescriptor(field.getName(), entity.getClass());
                 PropertyDescriptor pdSet = new PropertyDescriptor(field.getName(), dto.getClass());
                 Object newInstance = pdSet.getPropertyType().newInstance();
@@ -34,8 +35,7 @@ public interface ToDtoMapper<T, DTO> {
                     | IllegalAccessException
                     | IllegalArgumentException
                     | InvocationTargetException
-                    | InstantiationException
-                    | NoSuchFieldException e) {
+                    | InstantiationException e) {
                 logger.debug(e.getMessage(), e);
             }
         }
@@ -48,22 +48,43 @@ public interface ToDtoMapper<T, DTO> {
                 Field fieldDto = dto.getClass().getDeclaredField(field.getName());
                 PropertyDescriptor pdGet = new PropertyDescriptor(field.getName(), entity.getClass());
                 PropertyDescriptor pdSet = new PropertyDescriptor(field.getName(), dto.getClass());
-                Class<?> entityListType = pdGet.getPropertyType();
-                Class<?> dtoListType = pdSet.getPropertyType();
+                // calculate source and target type
+                Type typeSource = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                Type typeTarget = ((ParameterizedType) fieldDto.getGenericType()).getActualTypeArguments()[0];
 
-                if (List.class.equals(fieldDto.getType()) && List.class.equals(field.getType())) {
+                if (Arrays.stream(((Class)typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
+                        && List.class.equals(fieldDto.getType())
+                        && List.class.equals(field.getType())) {
                     logger.debug("List entity");
-                } else if (Set.class.equals(fieldDto.getType()) && Set.class.equals(field.getType())) {
+                    List<T> listOrig = (List<T>)pdGet.getReadMethod().invoke(entity);
+                    List<DTO> listTarget = new ArrayList<>();
+                    for (T element : listOrig) {
+                        DTO newInstance = (DTO) ((Class)typeTarget).newInstance();
+                        ((ToDtoMapper<T, DTO>)element).toDto(element, newInstance);
+                        listTarget.add(newInstance);
+                    }
+                    pdSet.getWriteMethod().invoke(dto, listTarget);
+                } else if (Arrays.stream(((Class)typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
+                        && Set.class.equals(fieldDto.getType())
+                        && Set.class.equals(field.getType())) {
                     logger.debug("Set entity");
-                } else if (Map.class.equals(fieldDto.getType()) && Map.class.equals(field.getType())) {
-                    logger.debug("Map entity");
+                    Set<T> setOrig = (Set<T>)pdGet.getReadMethod().invoke(entity);
+                    Set<DTO> setTarget = new HashSet<>();
+                    for (T element : setOrig) {
+                        DTO newInstance = (DTO) ((Class)typeTarget).newInstance();
+                        ((ToDtoMapper<T, DTO>)element).toDto(element, newInstance);
+                        setTarget.add(newInstance);
+                    }
+                    pdSet.getWriteMethod().invoke(dto, setTarget);
+//                } else if (Map.class.equals(fieldDto.getType()) && Map.class.equals(field.getType())) {
+//                    logger.debug("Map entity");
                 } else throw new UnsupportedOperationException();
 
             } catch (IntrospectionException
-//                    | IllegalAccessException
+                    | IllegalAccessException
                     | IllegalArgumentException
-//                    | InvocationTargetException
-//                    | InstantiationException
+                    | InvocationTargetException
+                    | InstantiationException
                     | NoSuchFieldException e) {
                 logger.debug(e.getMessage(), e);
             }
