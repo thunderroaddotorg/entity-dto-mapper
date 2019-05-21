@@ -29,6 +29,9 @@ public interface ToDtoMapper<T, DTO> {
      * Members that implement the ToDtoMapper interface will also be converted.
      * Members that are Collections of type java.util.List or java.util.Set will be converted
      * in a java.uti.List or java.util.Set of the corresponding DTO bean types.
+     * Members that are of type Map will be converted in a Map where the key and/or value will be
+     * converted if they are from a type that implements the ToDtoMapper interface.
+     *
      * @param entity the entity bean that needs to be converted. (Is at the same time the calling object)
      * @param dto the DTO bean that the entity will be converted into. (needs to be instantiated before)
      */
