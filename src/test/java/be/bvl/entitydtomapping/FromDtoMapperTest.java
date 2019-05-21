@@ -105,11 +105,11 @@ public class FromDtoMapperTest {
         ClassADTO dtoA1 = new ClassADTO(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
         ClassADTO dtoA2 = new ClassADTO(CLASS_A2_ID, CLASS_A2_NAME, CLASS_A2_DATE, CLASS_A2_OBJECT);
 
-        Queue<ClassADTO> classAVector = new LinkedList<>();
+        Queue<ClassADTO> classACollection = new LinkedList<>();
 
-        classAVector.add(dtoA1);
-        classAVector.add(dtoA2);
-        ClassFWithInvalidCollectionDTO dto = new ClassFWithInvalidCollectionDTO(CLASS_F_ID, classAVector);
+        classACollection.add(dtoA1);
+        classACollection.add(dtoA2);
+        ClassFWithInvalidCollectionDTO dto = new ClassFWithInvalidCollectionDTO(CLASS_F_ID, classACollection);
 
         ClassFWithInvalidCollection entity = new ClassFWithInvalidCollection();
         try {
