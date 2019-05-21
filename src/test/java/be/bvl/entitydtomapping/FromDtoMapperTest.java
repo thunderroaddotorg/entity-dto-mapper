@@ -142,9 +142,15 @@ public class FromDtoMapperTest {
         map2DTO.put(dtoA1,dtoB);
         Map<String, Long> stringLongMap = new HashMap<>();
         stringLongMap.put("testString", 666L);
+        Map<ClassA, Date> map4 = new HashMap<>();
+        map4.put(expectedEntityA1, expectedEntityA1.getDateMember());
+        map4.put(expectedEntityA2, expectedEntityA2.getDateMember());
+        Map<ClassADTO, Date> map4DTO = new HashMap<>();
+        map4DTO.put(dtoA1, dtoA1.getDateMember());
+        map4DTO.put(dtoA2, dtoA2.getDateMember());
 
-        ClassFWithMap expectedEntity = new ClassFWithMap(CLASS_F_ID, map1, map2, stringLongMap);
-        ClassFWithMapDTO dto = new ClassFWithMapDTO(CLASS_F_ID, map1DTO, map2DTO, stringLongMap);
+        ClassFWithMap expectedEntity = new ClassFWithMap(CLASS_F_ID, map1, map2, stringLongMap, map4);
+        ClassFWithMapDTO dto = new ClassFWithMapDTO(CLASS_F_ID, map1DTO, map2DTO, stringLongMap, map4DTO);
 
         ClassFWithMap entity = new ClassFWithMap();
         dto.fromDto(dto, entity);

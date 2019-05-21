@@ -3,6 +3,7 @@ package dto;
 import be.bvl.entitydtomapping.FromDtoMapper;
 import entity.ClassFWithMap;
 
+import java.util.Date;
 import java.util.Map;
 
 public class ClassFWithMapDTO extends AbstractClassDDTO implements FromDtoMapper<ClassFWithMap, ClassFWithMapDTO> {
@@ -10,15 +11,21 @@ public class ClassFWithMapDTO extends AbstractClassDDTO implements FromDtoMapper
     private Map<String,ClassADTO> membersMap1;
     private Map<ClassADTO, ClassBDTO> membersMap2;
     private Map<String, Long> membersMap3;
+    private Map<ClassADTO, Date> membersMap4;
 
     public ClassFWithMapDTO() {
     }
 
-    public ClassFWithMapDTO(long id, Map<String,ClassADTO> membersMap1, Map<ClassADTO,ClassBDTO> membersMap2, Map<String, Long> membersMap3) {
+    public ClassFWithMapDTO(long id,
+                            Map<String,ClassADTO> membersMap1,
+                            Map<ClassADTO,ClassBDTO> membersMap2,
+                            Map<String, Long> membersMap3,
+                            Map<ClassADTO, Date> membersMap4) {
         super(id);
         this.membersMap1 = membersMap1;
         this.membersMap2 = membersMap2;
         this.membersMap3 = membersMap3;
+        this.membersMap4 = membersMap4;
     }
 
     public Map<String, ClassADTO> getMembersMap1() {
@@ -45,12 +52,21 @@ public class ClassFWithMapDTO extends AbstractClassDDTO implements FromDtoMapper
         this.membersMap3 = membersMap3;
     }
 
+    public Map<ClassADTO, Date> getMembersMap4() {
+        return membersMap4;
+    }
+
+    public void setMembersMap4(Map<ClassADTO, Date> membersMap4) {
+        this.membersMap4 = membersMap4;
+    }
+
     @Override
     public String toString() {
         return "ClassFWithCollectionDTO{" +
                 "membersMap1=" + membersMap1 +
                 ", membersMap2=" + membersMap2 +
                 ", membersMap3=" + membersMap3 +
+                ", membersMap4=" + membersMap4 +
                 ", id=" + getId() +
                 '}';
     }
@@ -65,7 +81,8 @@ public class ClassFWithMapDTO extends AbstractClassDDTO implements FromDtoMapper
 
         return getMembersMap1().equals(that.getMembersMap1())
                 && getMembersMap2().equals(that.getMembersMap2())
-                && getMembersMap3().equals(that.getMembersMap3());
+                && getMembersMap3().equals(that.getMembersMap3())
+                && getMembersMap4().equals(that.getMembersMap4());
 
     }
 
@@ -75,7 +92,8 @@ public class ClassFWithMapDTO extends AbstractClassDDTO implements FromDtoMapper
         result = 31 * result
                 + getMembersMap1().hashCode()
                 + getMembersMap2().hashCode()
-                + getMembersMap3().hashCode();
+                + getMembersMap3().hashCode()
+                + getMembersMap4().hashCode();
         return result;
     }
 }
