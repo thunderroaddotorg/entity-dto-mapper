@@ -4,9 +4,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>be.bvl.entitydtomapping</groupId>
+    <groupId>org.thunderroad.entitydtomapping</groupId>
     <artifactId>entity-dto-mapping</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Entity-to-DTO-mapper</name>
+    <description>This project offers a simple mapper for mapping entity beans to similar DTO beans, and back</description>
+    <url>this should be the website where there is info</url>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License, version 3</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <build>
         <plugins>
             <plugin>
@@ -38,6 +52,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 
 </project>

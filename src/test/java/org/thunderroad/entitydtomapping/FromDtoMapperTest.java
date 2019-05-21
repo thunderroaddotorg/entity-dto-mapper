@@ -1,4 +1,4 @@
-package be.bvl.entitydtomapping;
+package org.thunderroad.entitydtomapping;
 
 import dto.*;
 import entity.*;

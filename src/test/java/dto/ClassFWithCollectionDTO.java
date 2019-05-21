@@ -1,7 +1,7 @@
 package dto;
 
-import be.bvl.entitydtomapping.FromDtoMapper;
 import entity.ClassFWithCollection;
+import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 import java.util.List;
 import java.util.Set;

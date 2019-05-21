@@ -1,4 +1,4 @@
-package be.bvl.entitydtomapping;
+package org.thunderroad.entitydtomapping;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

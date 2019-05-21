@@ -1,7 +1,7 @@
 package dto;
 
-import be.bvl.entitydtomapping.FromDtoMapper;
 import entity.ClassA;
+import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 import java.util.Date;
 import java.util.Objects;

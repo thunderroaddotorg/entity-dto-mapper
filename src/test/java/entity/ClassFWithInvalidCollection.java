@@ -1,7 +1,7 @@
 package entity;
 
-import be.bvl.entitydtomapping.ToDtoMapper;
 import dto.ClassFWithInvalidCollectionDTO;
+import org.thunderroad.entitydtomapping.ToDtoMapper;
 
 import java.util.Queue;
 

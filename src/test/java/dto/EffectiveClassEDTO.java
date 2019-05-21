@@ -1,7 +1,7 @@
 package dto;
 
-import be.bvl.entitydtomapping.FromDtoMapper;
 import entity.EffectiveClassE;
+import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 public class EffectiveClassEDTO extends AbstractClassDDTO implements FromDtoMapper<EffectiveClassE, EffectiveClassEDTO> {
 
