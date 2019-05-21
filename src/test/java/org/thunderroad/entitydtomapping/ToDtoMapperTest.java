@@ -105,11 +105,11 @@ public class ToDtoMapperTest {
         ClassA entityA1 = new ClassA(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
         ClassA entityA2 = new ClassA(CLASS_A2_ID, CLASS_A2_NAME, CLASS_A2_DATE, CLASS_A2_OBJECT);
 
-        Queue<ClassA> classAVector = new LinkedList<>();
+        Queue<ClassA> classACollection = new LinkedList<>();
 
-        classAVector.add(entityA1);
-        classAVector.add(entityA2);
-        ClassFWithInvalidCollection entity = new ClassFWithInvalidCollection(CLASS_F_ID, classAVector);
+        classACollection.add(entityA1);
+        classACollection.add(entityA2);
+        ClassFWithInvalidCollection entity = new ClassFWithInvalidCollection(CLASS_F_ID, classACollection);
 
         ClassFWithInvalidCollectionDTO dto = new ClassFWithInvalidCollectionDTO();
         try {
@@ -120,4 +120,40 @@ public class ToDtoMapperTest {
         }
     }
 
+    @Test
+    public void toDtoMapperWithMap() {
+
+        ClassA entityA1 = new ClassA(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
+        ClassA entityA2 = new ClassA(CLASS_A2_ID, CLASS_A2_NAME, CLASS_A2_DATE, CLASS_A2_OBJECT);
+        ClassADTO expectedDtoA1 = new ClassADTO(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
+        ClassADTO expectedDtoA2 = new ClassADTO(CLASS_A2_ID, CLASS_A2_NAME, CLASS_A2_DATE, CLASS_A2_OBJECT);
+        ClassB entityB = new ClassB(CLASS_B_ID, entityA1);
+        ClassBDTO expectedDtoB = new ClassBDTO(CLASS_B_ID, expectedDtoA1);
+
+        Map<String,ClassA> map1 = new HashMap<>();
+        map1.put(entityA1.getName(), entityA1);
+        map1.put(entityA2.getName(), entityA2);
+        Map<ClassA,ClassB> map2 = new HashMap<>();
+        map2.put(entityA1,entityB);
+        Map<String,ClassADTO> map1DTO = new HashMap<>();
+        map1DTO.put(expectedDtoA1.getName(), expectedDtoA1);
+        map1DTO.put(expectedDtoA2.getName(), expectedDtoA2);
+        Map<ClassADTO,ClassBDTO> map2DTO = new HashMap<>();
+        map2DTO.put(expectedDtoA1,expectedDtoB);
+        Map<String, Long> stringLongMap = new HashMap<>();
+        stringLongMap.put("testString", 666L);
+        Map<ClassA, Date> map4 = new HashMap<>();
+        map4.put(entityA1, entityA1.getDateMember());
+        map4.put(entityA2, entityA2.getDateMember());
+        Map<ClassADTO, Date> map4DTO = new HashMap<>();
+        map4DTO.put(expectedDtoA1, expectedDtoA1.getDateMember());
+        map4DTO.put(expectedDtoA2, expectedDtoA2.getDateMember());
+
+        ClassFWithMap entity = new ClassFWithMap(CLASS_F_ID, map1, map2, stringLongMap, map4);
+        ClassFWithMapDTO expectedDto = new ClassFWithMapDTO(CLASS_F_ID, map1DTO, map2DTO, stringLongMap, map4DTO);
+
+        ClassFWithMapDTO dto = new ClassFWithMapDTO();
+        entity.toDto(entity, dto);
+        Assert.assertEquals(expectedDto, dto);
+    }
 }
