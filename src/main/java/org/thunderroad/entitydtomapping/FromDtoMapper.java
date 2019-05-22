@@ -111,8 +111,10 @@ public interface FromDtoMapper<T, DTO> {
                 Type keyTypeDto = ((ParameterizedType)fieldDto.getGenericType()).getActualTypeArguments()[0];
                 Type valueTypeDto = ((ParameterizedType)fieldDto.getGenericType()).getActualTypeArguments()[1];
 
-                boolean srcMappedKeyType = Arrays.stream(((Class) keyTypeDto).getInterfaces()).collect(Collectors.toList()).contains(FromDtoMapper.class);
-                boolean srcMappedValueType = Arrays.stream(((Class) valueTypeDto).getInterfaces()).collect(Collectors.toList()).contains(FromDtoMapper.class);
+                boolean srcMappedKeyType = Arrays.stream(((Class) keyTypeDto).getInterfaces())
+                        .collect(Collectors.toList()).contains(FromDtoMapper.class);
+                boolean srcMappedValueType = Arrays.stream(((Class) valueTypeDto).getInterfaces())
+                        .collect(Collectors.toList()).contains(FromDtoMapper.class);
 
                 if (!srcMappedKeyType && !srcMappedValueType) {
                     continue;
