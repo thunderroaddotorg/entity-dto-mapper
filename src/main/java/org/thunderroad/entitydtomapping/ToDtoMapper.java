@@ -153,7 +153,11 @@ public interface ToDtoMapper<T, DTO> {
                 }
                 pdSet.getWriteMethod().invoke(dto, targetMap);
 
-            } catch (NoSuchFieldException | IntrospectionException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            } catch (NoSuchFieldException
+                    | IntrospectionException
+                    | IllegalAccessException
+                    | InvocationTargetException
+                    | InstantiationException e) {
                 e.printStackTrace();
             }
 

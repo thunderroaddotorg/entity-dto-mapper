@@ -152,7 +152,11 @@ public interface FromDtoMapper<T, DTO> {
                 }
                 pdSet.getWriteMethod().invoke(entity, targetMap);
 
-            } catch (NoSuchFieldException | IntrospectionException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            } catch (NoSuchFieldException
+                    | IntrospectionException
+                    | IllegalAccessException
+                    | InvocationTargetException
+                    | InstantiationException e) {
                 e.printStackTrace();
             }
 
