@@ -3,6 +3,7 @@ package org.thunderroad.entitydtomapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.Assert;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -45,9 +46,9 @@ public interface ToDtoMapper<T, DTO> {
             try {
                 PropertyDescriptor pdGet = new PropertyDescriptor(field.getName(), entity.getClass());
                 PropertyDescriptor pdSet = new PropertyDescriptor(field.getName(), dto.getClass());
-                Object newInstance = pdSet.getPropertyType().newInstance();
-                Object obj = pdGet.getReadMethod().invoke(entity);
-                ((ToDtoMapper<T, DTO>) obj).toDto((T) obj, (DTO) newInstance);
+                DTO newInstance = (DTO)pdSet.getPropertyType().newInstance();
+                T obj = (T)pdGet.getReadMethod().invoke(entity);
+                ((ToDtoMapper<T, DTO>) obj).toDto(obj, newInstance);
                 pdSet.getWriteMethod().invoke(dto, newInstance);
             } catch (IntrospectionException
                     | IllegalAccessException
@@ -70,33 +71,28 @@ public interface ToDtoMapper<T, DTO> {
                 Type typeSource = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
                 Type typeTarget = ((ParameterizedType) fieldDto.getGenericType()).getActualTypeArguments()[0];
 
+                Collection<T> originalCollection = (Collection<T>) pdGet.getReadMethod().invoke(entity);
+                Collection<DTO> targetCollection = null;
                 if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
                         && List.class.equals(fieldDto.getType())
                         && List.class.equals(field.getType())) {
                     logger.debug("List entity");
-                    List<T> listOrig = (List<T>) pdGet.getReadMethod().invoke(entity);
-                    List<DTO> listTarget = new ArrayList<>();
-                    for (T element : listOrig) {
-                        DTO newInstance = (DTO) ((Class) typeTarget).newInstance();
-                        ((ToDtoMapper<T, DTO>) element).toDto(element, newInstance);
-                        listTarget.add(newInstance);
-                    }
-                    pdSet.getWriteMethod().invoke(dto, listTarget);
+                    targetCollection = new ArrayList<>();
                 } else if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
                         && Set.class.equals(fieldDto.getType())
                         && Set.class.equals(field.getType())) {
                     logger.debug("Set entity");
-                    Set<T> setOrig = (Set<T>) pdGet.getReadMethod().invoke(entity);
-                    Set<DTO> setTarget = new HashSet<>();
-                    for (T element : setOrig) {
-                        DTO newInstance = (DTO) ((Class) typeTarget).newInstance();
-                        ((ToDtoMapper<T, DTO>) element).toDto(element, newInstance);
-                        setTarget.add(newInstance);
-                    }
-                    pdSet.getWriteMethod().invoke(dto, setTarget);
+                    targetCollection = new HashSet<>();
                 } else {
                     throw new UnsupportedOperationException(this.getClass().getTypeName() + " holds a member that is a java.util.Collection other than java.util.List or java.util.Set.");
                 }
+                Assert.notNull(targetCollection, "Something went wrong while creating target collection. Only java.util.List and java.util.Set are supported!");
+                for (T element : originalCollection) {
+                    DTO newInstance = (DTO) ((Class) typeTarget).newInstance();
+                    ((ToDtoMapper<T, DTO>) element).toDto(element, newInstance);
+                    targetCollection.add(newInstance);
+                }
+                pdSet.getWriteMethod().invoke(dto, targetCollection);
             } catch (IntrospectionException
                     | IllegalAccessException
                     | IllegalArgumentException

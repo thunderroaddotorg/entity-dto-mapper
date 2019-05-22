@@ -3,6 +3,7 @@ package org.thunderroad.entitydtomapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.Assert;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -69,33 +70,28 @@ public interface FromDtoMapper<T, DTO> {
                 Type typeSource = ((ParameterizedType) fieldDto.getGenericType()).getActualTypeArguments()[0];
                 Type typeTarget = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
 
+                Collection<DTO> originalCollection = (Collection<DTO>) pdGet.getReadMethod().invoke(dto);
+                Collection<T> targetCollection = null;
                 if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(FromDtoMapper.class)
                         && List.class.equals(fieldDto.getType())
                         && List.class.equals(field.getType())) {
                     logger.debug("List entity");
-                    List<DTO> listOrig = (List<DTO>) pdGet.getReadMethod().invoke(dto);
-                    List<T> listTarget = new ArrayList<>();
-                    for (DTO element : listOrig) {
-                        T newInstance = (T) ((Class) typeTarget).newInstance();
-                        ((FromDtoMapper<T, DTO>) element).fromDto(element, newInstance);
-                        listTarget.add(newInstance);
-                    }
-                    pdSet.getWriteMethod().invoke(entity, listTarget);
+                    targetCollection = new ArrayList<>();
                 } else if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(FromDtoMapper.class)
                         && Set.class.equals(fieldDto.getType())
                         && Set.class.equals(fieldDto.getType())) {
                     logger.debug("Set entity");
-                    Set<DTO> setOrig = (Set<DTO>) pdGet.getReadMethod().invoke(dto);
-                    Set<T> setTarget = new HashSet<>();
-                    for (DTO element : setOrig) {
-                        T newInstance = (T) ((Class) typeTarget).newInstance();
-                        ((FromDtoMapper<T, DTO>) element).fromDto(element, newInstance);
-                        setTarget.add(newInstance);
-                    }
-                    pdSet.getWriteMethod().invoke(entity, setTarget);
+                    targetCollection = new HashSet<>();
                 } else {
                     throw new UnsupportedOperationException(this.getClass().getTypeName() + " holds a member that is a java.util.Collection other than java.util.List or java.util.Set.");
                 }
+                Assert.notNull(targetCollection, "Something went wrong while creating target collection. Only java.util.List and java.util.Set are supported!");
+                for (DTO element : originalCollection) {
+                    T newInstance = (T) ((Class) typeTarget).newInstance();
+                    ((FromDtoMapper<T, DTO>) element).fromDto(element, newInstance);
+                    targetCollection.add(newInstance);
+                }
+                pdSet.getWriteMethod().invoke(entity, targetCollection);
             } catch (IntrospectionException
                     | IllegalAccessException
                     | IllegalArgumentException
