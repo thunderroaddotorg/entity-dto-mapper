@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.thunderroad.entitydtomapping</groupId>
-    <artifactId>entity-dto-mapping</artifactId>
+    <groupId>org.thunderroad</groupId>
+    <artifactId>entity-dto-mapper</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Entity-to-DTO-mapper</name>
     <description>This project offers a simple mapper for mapping entity beans to similar DTO beans, and back</description>
-    <url>this should be the website where there is info</url>
+    <url>https://github.com/thunderroaddotorg/entity-dto-mapper</url>
 
     <licenses>
         <license>
