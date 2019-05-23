@@ -7,10 +7,7 @@ import org.springframework.util.Assert;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -158,6 +155,44 @@ public interface FromDtoMapper<T, DTO> {
                 e.printStackTrace();
             }
 
+        }
+
+        for (Field fieldDto : Arrays.stream(this.getClass().getDeclaredFields())
+                .filter(field -> ((Class)field.getType()).isArray())
+                .collect(Collectors.toList())) {
+            try {
+                String elementTypename = fieldDto.getType().getTypeName().substring(0, fieldDto.getType().getTypeName().length() - 2);
+                Class<?> elementTypeSrc = Class.forName(elementTypename);
+
+                if (Arrays.stream(elementTypeSrc.getInterfaces()).collect(Collectors.toList()).contains(FromDtoMapper.class)) {
+                    Field field = entity.getClass().getDeclaredField(fieldDto.getName());
+                    String targetElementTypename = field.getType().getTypeName().substring(0, field.getType().getTypeName().length() - 2);
+                    Class<?> elementTypeTarget = Class.forName(targetElementTypename);
+
+                    PropertyDescriptor pdGet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
+                    PropertyDescriptor pdSet = new PropertyDescriptor(field.getName(), entity.getClass());
+
+                    Object srcObject = fieldDto.getType().cast(pdGet.getReadMethod().invoke(dto));
+                    DTO[] srcArray = (DTO[]) srcObject;
+                    int length = srcArray.length;
+                    T[] targetArray = (T[]) Array.newInstance(elementTypeTarget, length);
+                    for (int index = 0; index < length; index++) {
+                        T newinstance = (T)elementTypeTarget.newInstance();
+                        ((FromDtoMapper<T,DTO>)srcArray[index]).fromDto(srcArray[index], newinstance);
+                        targetArray[index] = newinstance;
+                    }
+                    pdSet.getWriteMethod().invoke(entity, (Object) targetArray);
+
+                }
+
+            } catch (ClassNotFoundException
+                    | NoSuchFieldException
+                    | IntrospectionException
+                    | IllegalAccessException
+                    | InvocationTargetException
+                    | InstantiationException e) {
+                logger.debug(e.getMessage(), e);
+            }
         }
 
     }

@@ -62,7 +62,7 @@ public class ClassFWithMapDTO extends AbstractClassDDTO implements FromDtoMapper
 
     @Override
     public String toString() {
-        return "ClassFWithCollectionDTO{" +
+        return "ClassFWithMapDTO{" +
                 "membersMap1=" + membersMap1 +
                 ", membersMap2=" + membersMap2 +
                 ", membersMap3=" + membersMap3 +

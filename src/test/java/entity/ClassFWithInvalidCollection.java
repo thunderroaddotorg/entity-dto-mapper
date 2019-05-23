@@ -27,7 +27,7 @@ public class ClassFWithInvalidCollection extends AbstractClassD implements ToDto
 
     @Override
     public String toString() {
-        return "ClassFWithCollection{" +
+        return "ClassFWithInvalidCollection{" +
                 "members=" + members +
                 ", id=" + getId() +
                 '}';

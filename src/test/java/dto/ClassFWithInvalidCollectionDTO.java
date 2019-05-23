@@ -27,7 +27,7 @@ public class ClassFWithInvalidCollectionDTO extends AbstractClassDDTO implements
 
     @Override
     public String toString() {
-        return "ClassFWithCollectionDTO{" +
+        return "ClassFWithInvalidCollectionDTO{" +
                 "members=" + members +
                 ", id=" + getId() +
                 '}';

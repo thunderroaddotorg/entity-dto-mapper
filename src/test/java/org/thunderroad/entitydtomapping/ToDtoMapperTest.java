@@ -156,4 +156,22 @@ public class ToDtoMapperTest {
         entity.toDto(entity, dto);
         Assert.assertEquals(expectedDto, dto);
     }
+
+    @Test
+    public void toDtoMapperWithArray() {
+
+        ClassA entityA1 = new ClassA(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
+        ClassA entityA2 = new ClassA(CLASS_A2_ID, CLASS_A2_NAME, CLASS_A2_DATE, CLASS_A2_OBJECT);
+        ClassADTO expectedDtoA1 = new ClassADTO(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
+        ClassADTO expectedDtoA2 = new ClassADTO(CLASS_A2_ID, CLASS_A2_NAME, CLASS_A2_DATE, CLASS_A2_OBJECT);
+
+        ClassFWithArray entity = new ClassFWithArray(CLASS_F_ID, new ClassA[] {entityA1, entityA2},
+                new Long[] {666L, 777L}, new int[] {1});
+        ClassFWithArrayDTO expectedDto = new ClassFWithArrayDTO(CLASS_F_ID, new ClassADTO[] {expectedDtoA1, expectedDtoA2},
+                new Long[] {666L, 777L}, new int[] {1});
+
+        ClassFWithArrayDTO dto = new ClassFWithArrayDTO();
+        entity.toDto(entity, dto);
+        Assert.assertEquals(expectedDto, dto);
+    }
 }
