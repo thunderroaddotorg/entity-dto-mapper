@@ -24,6 +24,13 @@
         </repository>
     </distributionManagement>
 
+    <developers>
+        <developer>
+            <name>Admin Thunderroad</name>
+            <email>thunderroad.org@tutanota.com</email>
+        </developer>
+    </developers>
+
     <licenses>
         <license>
             <name>GNU General Public License, version 3</name>
