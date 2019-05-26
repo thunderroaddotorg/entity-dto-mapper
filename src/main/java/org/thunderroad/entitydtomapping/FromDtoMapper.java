@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 
 /**
  * Interface to add conversion method from a DTO bean of type DTO to a entity bean of type T.
- * @param <T>
- * @param <DTO>
+ * @param <T> the class of the entity bean
+ * @param <DTO> the class of the DTO bean
  *
  * @author Van Lommel Bart
  */
