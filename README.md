@@ -64,6 +64,8 @@ Some prerequisites:
   * SomeEntity and SomeDTO have the same mirrored structure, f.e. a member of type List<SomeOtherClass> has a mirror member of type List<SomeOtherDTO>.
   * for the members the types java.util.List, java.util.Set, java.util.Map, as well as arrays are supported and also converted, primitive members and objects of classes that don't implement the ToDtoMapper (or in reverse FromDtoMapper), will be copied as is.
   * the classes SomeEntity and SomeDTO need to have a default constructor.
+  * if the field names differ in the entity bean and the dto, they can be mapped with the @Mapping annotation (in both directions).
+  * if a field does not have a mirrored member and does not need to be converted, this can be indicated with the @IgnoreMapping annotation.
 
 2.Execute the conversion in the code. 
 
