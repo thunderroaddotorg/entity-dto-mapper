@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
+import org.thunderroad.entitydtomapping.annotaions.IgnoreMapping;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -39,6 +40,9 @@ public interface FromDtoMapper<T, DTO> {
                 .filter(field -> Arrays.stream(field.getType().getInterfaces()).collect(Collectors.toList())
                         .contains(FromDtoMapper.class)).collect(Collectors.toList())) {
 
+            if (fieldDto.isAnnotationPresent(IgnoreMapping.class)) {
+                continue;
+            }
             try {
                 PropertyDescriptor pdGet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
                 PropertyDescriptor pdSet = new PropertyDescriptor(fieldDto.getName(), entity.getClass());
@@ -59,6 +63,9 @@ public interface FromDtoMapper<T, DTO> {
                 .filter(field -> Arrays.stream(field.getType().getInterfaces()).collect(Collectors.toList())
                         .contains(Collection.class)).collect(Collectors.toList())) {
 
+            if (fieldDto.isAnnotationPresent(IgnoreMapping.class)) {
+                continue;
+            }
             try {
                 Field field = entity.getClass().getDeclaredField(fieldDto.getName());
                 PropertyDescriptor pdGet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
@@ -103,6 +110,9 @@ public interface FromDtoMapper<T, DTO> {
                 .filter(field -> field.getType().equals(Map.class))
                 .collect(Collectors.toList())) {
 
+            if (fieldDto.isAnnotationPresent(IgnoreMapping.class)) {
+                continue;
+            }
             try {
                 logger.debug("Map field " + fieldDto.getName());
                 Type keyTypeDto = ((ParameterizedType)fieldDto.getGenericType()).getActualTypeArguments()[0];

@@ -27,6 +27,12 @@ public class ToDtoMapperTest {
     private static final long CLASS_E_ID = 5L;
     private static final String CLASS_E_NAME = "classE Name";
     private static final long CLASS_F_ID = 6L;
+    private static final long CLASS_G_ID = 7L;
+    private static final String CLASS_G_NAME = "classG Name";
+    private static final long CLASS_H1_ID = 8L;
+    private static final String CLASS_H1_NAME = "classH1 Name";
+    private static final long CLASS_H2_ID = 9L;
+    private static final String CLASS_H2_NAME = "classH2 Name";
 
     @Test
     public void toDtoSimple() {
@@ -173,5 +179,26 @@ public class ToDtoMapperTest {
         ClassFWithArrayDTO dto = new ClassFWithArrayDTO();
         entity.toDto(entity, dto);
         Assert.assertEquals(expectedDto, dto);
+    }
+
+    @Test
+    public void toDtoMapperWithCycle() {
+        ClassGWithCycle entityG = new ClassGWithCycle(CLASS_G_ID, CLASS_G_NAME, null);
+        ClassHWithCycle entityH1 = new ClassHWithCycle(CLASS_H1_ID, CLASS_H1_NAME, entityG);
+        ClassHWithCycle entityH2 = new ClassHWithCycle(CLASS_H2_ID, CLASS_H2_NAME, entityG);
+        entityG.setMembersH(Arrays.asList(entityH1, entityH2));
+        ClassGWithCycleDTO expectedEntityGDTO = new ClassGWithCycleDTO(CLASS_G_ID, CLASS_G_NAME, null);
+        ClassHWithCycleDTO expectedEntityH1DTO = new ClassHWithCycleDTO(CLASS_H1_ID, CLASS_H1_NAME);
+        ClassHWithCycleDTO expectedEntityH2DTO = new ClassHWithCycleDTO(CLASS_H2_ID, CLASS_H2_NAME);
+        expectedEntityGDTO.setMembersH(Arrays.asList(expectedEntityH1DTO, expectedEntityH2DTO));
+        ClassWithCycle entity = new ClassWithCycle(Arrays.asList(entityG));
+        entityG.setParent(entity);
+        ClassWithCycleDTO expectedDto = new ClassWithCycleDTO(Arrays.asList(expectedEntityGDTO));
+
+        ClassWithCycleDTO dto = new ClassWithCycleDTO();
+        entity.toDto(entity, dto);
+
+        Assert.assertEquals(expectedDto, dto);
+
     }
 }
