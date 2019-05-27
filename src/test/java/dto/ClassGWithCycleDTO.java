@@ -38,7 +38,7 @@ public class ClassGWithCycleDTO extends AbstractClassDDTO implements FromDtoMapp
 
     @Override
     public String toString() {
-        return "ClassGWithCycle{" +
+        return "ClassGWithCycleDTO{" +
                 "name='" + name + '\'' +
                 ", membersH=" + membersH +
                 '}';

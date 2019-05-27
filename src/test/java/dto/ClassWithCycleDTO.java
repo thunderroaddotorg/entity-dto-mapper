@@ -3,29 +3,31 @@ package dto;
 import entity.ClassWithCycle;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 import org.thunderroad.entitydtomapping.annotaions.IgnoreMapping;
+import org.thunderroad.entitydtomapping.annotaions.Mapping;
 
 import java.util.List;
 import java.util.Objects;
 
 public class ClassWithCycleDTO implements FromDtoMapper<ClassWithCycle,ClassWithCycleDTO> {
 
-    private List<ClassGWithCycleDTO> members;
+    @Mapping("members")
+    private List<ClassGWithCycleDTO> membersG;
     @IgnoreMapping
     private String ignoredMember;
 
     public ClassWithCycleDTO() {
     }
 
-    public ClassWithCycleDTO(List<ClassGWithCycleDTO> members) {
-        this.members = members;
+    public ClassWithCycleDTO(List<ClassGWithCycleDTO> membersG) {
+        this.membersG = membersG;
     }
 
-    public List<ClassGWithCycleDTO> getMembers() {
-        return members;
+    public List<ClassGWithCycleDTO> getMembersG() {
+        return membersG;
     }
 
-    public void setMembers(List<ClassGWithCycleDTO> members) {
-        this.members = members;
+    public void setMembersG(List<ClassGWithCycleDTO> membersG) {
+        this.membersG = membersG;
     }
 
     public String getIgnoredMember() {
@@ -39,7 +41,7 @@ public class ClassWithCycleDTO implements FromDtoMapper<ClassWithCycle,ClassWith
     @Override
     public String toString() {
         return "ClassWithCycleDTO{" +
-                "members=" + members +
+                "membersG=" + membersG +
                 '}';
     }
 
@@ -48,11 +50,11 @@ public class ClassWithCycleDTO implements FromDtoMapper<ClassWithCycle,ClassWith
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ClassWithCycleDTO that = (ClassWithCycleDTO) o;
-        return Objects.equals(members, that.members);
+        return Objects.equals(membersG, that.membersG);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(members);
+        return Objects.hash(membersG);
     }
 }

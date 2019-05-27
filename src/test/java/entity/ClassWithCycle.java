@@ -2,12 +2,14 @@ package entity;
 
 import dto.ClassWithCycleDTO;
 import org.thunderroad.entitydtomapping.ToDtoMapper;
+import org.thunderroad.entitydtomapping.annotaions.Mapping;
 
 import java.util.List;
 import java.util.Objects;
 
 public class ClassWithCycle implements ToDtoMapper<ClassWithCycle, ClassWithCycleDTO> {
 
+    @Mapping("membersG")
     private List<ClassGWithCycle> members;
 
     public ClassWithCycle() {

@@ -2,11 +2,13 @@ package entity;
 
 import dto.ClassHWithCycleDTO;
 import org.thunderroad.entitydtomapping.ToDtoMapper;
+import org.thunderroad.entitydtomapping.annotaions.Mapping;
 
 import java.util.Objects;
 
 public class ClassHWithCycle extends AbstractClassD implements ToDtoMapper<ClassHWithCycle, ClassHWithCycleDTO> {
 
+    @Mapping("nameH")
     private String name;
     private ClassGWithCycle memberG;
 

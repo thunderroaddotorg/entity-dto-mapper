@@ -2,33 +2,35 @@ package dto;
 
 import entity.ClassHWithCycle;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
+import org.thunderroad.entitydtomapping.annotaions.Mapping;
 
 import java.util.Objects;
 
 public class ClassHWithCycleDTO extends AbstractClassDDTO implements FromDtoMapper<ClassHWithCycle,ClassHWithCycleDTO> {
 
-    private String name;
+    @Mapping("name")
+    private String nameH;
 
     public ClassHWithCycleDTO() {
     }
 
-    public ClassHWithCycleDTO(long id, String name) {
+    public ClassHWithCycleDTO(long id, String nameH) {
         super(id);
-        this.name = name;
+        this.nameH = nameH;
     }
 
-    public String getName() {
-        return name;
+    public String getNameH() {
+        return nameH;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameH(String nameH) {
+        this.nameH = nameH;
     }
 
     @Override
     public String toString() {
-        return "ClassHWithCycle{" +
-                "name='" + name + '\'' +
+        return "ClassHWithCycleDTO{" +
+                "nameH='" + nameH + '\'' +
                 '}';
     }
 
@@ -38,11 +40,11 @@ public class ClassHWithCycleDTO extends AbstractClassDDTO implements FromDtoMapp
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         ClassHWithCycleDTO that = (ClassHWithCycleDTO) o;
-        return Objects.equals(name, that.name);
+        return Objects.equals(nameH, that.nameH);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name);
+        return Objects.hash(super.hashCode(), nameH);
     }
 }

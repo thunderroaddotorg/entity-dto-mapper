@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 import org.thunderroad.entitydtomapping.annotaions.IgnoreMapping;
+import org.thunderroad.entitydtomapping.annotaions.Mapping;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -37,20 +38,25 @@ public interface ToDtoMapper<T, DTO> {
     default void toDto(T entity, DTO dto) {
         BeanUtils.copyProperties(entity, dto);
 
-        for (Field field : Arrays.stream(this.getClass().getDeclaredFields())
-                .filter(field -> Arrays.stream(field.getType().getInterfaces()).collect(Collectors.toList())
-                        .contains(ToDtoMapper.class)).collect(Collectors.toList())) {
-
+        for (Field field : this.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(IgnoreMapping.class)) {
                 continue;
             }
+            String mapping = field.isAnnotationPresent(Mapping.class) ? field.getAnnotation(Mapping.class).value() : field.getName();
+
             try {
                 PropertyDescriptor pdGet = new PropertyDescriptor(field.getName(), entity.getClass());
-                PropertyDescriptor pdSet = new PropertyDescriptor(field.getName(), dto.getClass());
-                DTO newInstance = (DTO)pdSet.getPropertyType().newInstance();
-                T obj = (T)pdGet.getReadMethod().invoke(entity);
-                ((ToDtoMapper<T, DTO>) obj).toDto(obj, newInstance);
-                pdSet.getWriteMethod().invoke(dto, newInstance);
+                PropertyDescriptor pdSet = new PropertyDescriptor(mapping, dto.getClass());
+                if (Arrays.stream(field.getType().getInterfaces()).collect(Collectors.toList())
+                        .contains(ToDtoMapper.class)) {
+                    DTO newInstance = (DTO) pdSet.getPropertyType().newInstance();
+                    T obj = (T) pdGet.getReadMethod().invoke(entity);
+                    ((ToDtoMapper<T, DTO>) obj).toDto(obj, newInstance);
+                    pdSet.getWriteMethod().invoke(dto, newInstance);
+                } else if (field.isAnnotationPresent(Mapping.class)) {
+                    pdSet.getWriteMethod().invoke(dto, pdGet.getReadMethod().invoke(entity));
+                }
+
             } catch (IntrospectionException
                     | IllegalAccessException
                     | IllegalArgumentException
@@ -58,6 +64,7 @@ public interface ToDtoMapper<T, DTO> {
                     | InstantiationException e) {
                 logger.debug(e.getMessage(), e);
             }
+
         }
 
         for (Field field : Arrays.stream(this.getClass().getDeclaredFields())
@@ -67,10 +74,11 @@ public interface ToDtoMapper<T, DTO> {
             if (field.isAnnotationPresent(IgnoreMapping.class)) {
                 continue;
             }
+            String mapping = field.isAnnotationPresent(Mapping.class) ? field.getAnnotation(Mapping.class).value() : field.getName();
             try {
-                Field fieldDto = dto.getClass().getDeclaredField(field.getName());
+                Field fieldDto = dto.getClass().getDeclaredField(mapping);
                 PropertyDescriptor pdGet = new PropertyDescriptor(field.getName(), entity.getClass());
-                PropertyDescriptor pdSet = new PropertyDescriptor(field.getName(), dto.getClass());
+                PropertyDescriptor pdSet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
                 // calculate source and target type
                 Type typeSource = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
                 Type typeTarget = ((ParameterizedType) fieldDto.getGenericType()).getActualTypeArguments()[0];
@@ -114,6 +122,7 @@ public interface ToDtoMapper<T, DTO> {
             if (field.isAnnotationPresent(IgnoreMapping.class)) {
                 continue;
             }
+            String mapping = field.isAnnotationPresent(Mapping.class) ? field.getAnnotation(Mapping.class).value() : field.getName();
             try {
                 logger.debug("Map field " + field.getName());
                 Type keyTypeEntity = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
@@ -125,12 +134,12 @@ public interface ToDtoMapper<T, DTO> {
                 if (!srcMappedKeyType && !srcMappedValueType) {
                     continue;
                 }
-                Field fieldDto = dto.getClass().getDeclaredField(field.getName());
+                Field fieldDto = dto.getClass().getDeclaredField(mapping);
                 Type keyTypeDto = ((ParameterizedType)fieldDto.getGenericType()).getActualTypeArguments()[0];
                 Type valueTypeDto = ((ParameterizedType)fieldDto.getGenericType()).getActualTypeArguments()[1];
 
                 PropertyDescriptor pdGet = new PropertyDescriptor(field.getName(), entity.getClass());
-                PropertyDescriptor pdSet = new PropertyDescriptor(field.getName(), dto.getClass());
+                PropertyDescriptor pdSet = new PropertyDescriptor(mapping, dto.getClass());
 
                 Map srcMap = (Map)pdGet.getReadMethod().invoke(entity);
                 Map targetMap = new HashMap<>();
@@ -169,12 +178,13 @@ public interface ToDtoMapper<T, DTO> {
         for (Field field : Arrays.stream(this.getClass().getDeclaredFields())
                 .filter(field -> ((Class)field.getType()).isArray())
                 .collect(Collectors.toList())) {
+            String mapping = field.isAnnotationPresent(Mapping.class) ? field.getAnnotation(Mapping.class).value() : field.getName();
             try {
                 String elementTypename = field.getType().getTypeName().substring(0, field.getType().getTypeName().length() - 2);
                 Class<?> elementTypeSrc = Class.forName(elementTypename);
 
                 if (Arrays.stream(elementTypeSrc.getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)) {
-                    Field fieldDto = dto.getClass().getDeclaredField(field.getName());
+                    Field fieldDto = dto.getClass().getDeclaredField(mapping);
                     String targetElementTypename = fieldDto.getType().getTypeName().substring(0, fieldDto.getType().getTypeName().length() - 2);
                     Class<?> elementTypeTarget = Class.forName(targetElementTypename);
 

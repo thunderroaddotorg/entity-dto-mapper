@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 import org.thunderroad.entitydtomapping.annotaions.IgnoreMapping;
+import org.thunderroad.entitydtomapping.annotaions.Mapping;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -36,20 +37,24 @@ public interface FromDtoMapper<T, DTO> {
      */
     default void fromDto(DTO dto, T entity) {
         BeanUtils.copyProperties(dto, entity);
-        for (Field fieldDto : Arrays.stream(dto.getClass().getDeclaredFields())
-                .filter(field -> Arrays.stream(field.getType().getInterfaces()).collect(Collectors.toList())
-                        .contains(FromDtoMapper.class)).collect(Collectors.toList())) {
-
+        for (Field fieldDto : dto.getClass().getDeclaredFields()) {
             if (fieldDto.isAnnotationPresent(IgnoreMapping.class)) {
                 continue;
             }
+            String mapping = fieldDto.isAnnotationPresent(Mapping.class) ? fieldDto.getAnnotation(Mapping.class).value() : fieldDto.getName();
+
             try {
                 PropertyDescriptor pdGet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
-                PropertyDescriptor pdSet = new PropertyDescriptor(fieldDto.getName(), entity.getClass());
-                Object newInstance = pdSet.getPropertyType().newInstance();
-                Object obj = pdGet.getReadMethod().invoke(dto);
-                ((FromDtoMapper<T, DTO>)obj).fromDto((DTO) obj, (T)newInstance);
-                pdSet.getWriteMethod().invoke(entity, newInstance);
+                PropertyDescriptor pdSet = new PropertyDescriptor(mapping, entity.getClass());
+                if (Arrays.stream(fieldDto.getType().getInterfaces()).collect(Collectors.toList())
+                        .contains(FromDtoMapper.class)) {
+                    Object newInstance = pdSet.getPropertyType().newInstance();
+                    Object obj = pdGet.getReadMethod().invoke(dto);
+                    ((FromDtoMapper<T, DTO>) obj).fromDto((DTO) obj, (T) newInstance);
+                    pdSet.getWriteMethod().invoke(entity, newInstance);
+                } else if (fieldDto.isAnnotationPresent(Mapping.class)) {
+                    pdSet.getWriteMethod().invoke(entity, pdGet.getReadMethod().invoke(dto));
+                }
             } catch (IntrospectionException
                     | IllegalAccessException
                     | IllegalArgumentException
@@ -66,8 +71,9 @@ public interface FromDtoMapper<T, DTO> {
             if (fieldDto.isAnnotationPresent(IgnoreMapping.class)) {
                 continue;
             }
+            String mapping = fieldDto.isAnnotationPresent(Mapping.class) ? fieldDto.getAnnotation(Mapping.class).value() : fieldDto.getName();
             try {
-                Field field = entity.getClass().getDeclaredField(fieldDto.getName());
+                Field field = entity.getClass().getDeclaredField(mapping);
                 PropertyDescriptor pdGet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
                 PropertyDescriptor pdSet = new PropertyDescriptor(field.getName(), entity.getClass());
                 // calculate source and target type
@@ -113,6 +119,7 @@ public interface FromDtoMapper<T, DTO> {
             if (fieldDto.isAnnotationPresent(IgnoreMapping.class)) {
                 continue;
             }
+            String mapping = fieldDto.isAnnotationPresent(Mapping.class) ? fieldDto.getAnnotation(Mapping.class).value() : fieldDto.getName();
             try {
                 logger.debug("Map field " + fieldDto.getName());
                 Type keyTypeDto = ((ParameterizedType)fieldDto.getGenericType()).getActualTypeArguments()[0];
@@ -126,7 +133,7 @@ public interface FromDtoMapper<T, DTO> {
                 if (!srcMappedKeyType && !srcMappedValueType) {
                     continue;
                 }
-                Field field = entity.getClass().getDeclaredField(fieldDto.getName());
+                Field field = entity.getClass().getDeclaredField(mapping);
                 Type keyTypeEntity = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
                 Type valueTypeEntity = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[1];
 
@@ -170,12 +177,13 @@ public interface FromDtoMapper<T, DTO> {
         for (Field fieldDto : Arrays.stream(this.getClass().getDeclaredFields())
                 .filter(field -> ((Class)field.getType()).isArray())
                 .collect(Collectors.toList())) {
+            String mapping = fieldDto.isAnnotationPresent(Mapping.class) ? fieldDto.getAnnotation(Mapping.class).value() : fieldDto.getName();
             try {
                 String elementTypename = fieldDto.getType().getTypeName().substring(0, fieldDto.getType().getTypeName().length() - 2);
                 Class<?> elementTypeSrc = Class.forName(elementTypename);
 
                 if (Arrays.stream(elementTypeSrc.getInterfaces()).collect(Collectors.toList()).contains(FromDtoMapper.class)) {
-                    Field field = entity.getClass().getDeclaredField(fieldDto.getName());
+                    Field field = entity.getClass().getDeclaredField(mapping);
                     String targetElementTypename = field.getType().getTypeName().substring(0, field.getType().getTypeName().length() - 2);
                     Class<?> elementTypeTarget = Class.forName(targetElementTypename);
 
