@@ -80,3 +80,6 @@ To get an entity from a DTO bean the following code can be used:
     // do something with the entity object
     ...
 ```
+
+## API
+https://www.javadoc.io/doc/com.github.thunderroaddotorg/entity-dto-mapper
