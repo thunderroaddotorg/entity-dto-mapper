@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
  * The name of the mirrored field is indicated by the value.
  *
  * @author Van Lommel Bart
+ * @since 1.1
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

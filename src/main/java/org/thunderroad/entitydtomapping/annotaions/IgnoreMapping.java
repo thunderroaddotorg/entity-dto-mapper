@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
  * Annotation to indicate that a field does not have a mirrored field on the other side of the conversion.
  *
  * @author Van Lommel Bart
+ * @since 1.1
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
