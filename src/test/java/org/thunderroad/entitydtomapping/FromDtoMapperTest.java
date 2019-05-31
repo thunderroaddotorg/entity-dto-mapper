@@ -39,7 +39,7 @@ public class FromDtoMapperTest {
         ClassA expectedEntity = new ClassA(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
         ClassADTO dto = new ClassADTO(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
 
-        Assert.assertEquals(expectedEntity, dto.fromDto(dto, new ClassA()));
+        Assert.assertEquals(expectedEntity, dto.fromDto(new ClassA()));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class FromDtoMapperTest {
         ClassADTO dtoA = new ClassADTO(CLASS_A1_ID, CLASS_A1_NAME, CLASS_A1_DATE, CLASS_A1_OBJECT);
         ClassBDTO dtoB = new ClassBDTO(CLASS_B_ID, dtoA);
 
-        Assert.assertEquals(expectedEntityB, dtoB.fromDto(dtoB, new ClassB()));
+        Assert.assertEquals(expectedEntityB, dtoB.fromDto(new ClassB()));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class FromDtoMapperTest {
         ClassBDTO dtoB = new ClassBDTO(CLASS_B_ID, dtoA);
         ClassCDTO dtoC = new ClassCDTO(CLASS_C_ID, CLASS_C_NAME, dtoB);
 
-        Assert.assertEquals(expectedEntityC, dtoC.fromDto(dtoC, new ClassC()));
+        Assert.assertEquals(expectedEntityC, dtoC.fromDto(new ClassC()));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class FromDtoMapperTest {
         EffectiveClassE expectedEntity = new EffectiveClassE(CLASS_E_ID, CLASS_E_NAME);
         EffectiveClassEDTO effectiveClassEDTO = new EffectiveClassEDTO(CLASS_E_ID, CLASS_E_NAME);
 
-        Assert.assertEquals(expectedEntity, effectiveClassEDTO.fromDto(effectiveClassEDTO, new EffectiveClassE()));
+        Assert.assertEquals(expectedEntity, effectiveClassEDTO.fromDto(new EffectiveClassE()));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class FromDtoMapperTest {
                         Arrays.asList(dtoA1, dtoA2),
                         new HashSet<>(Arrays.asList(dtoA1, dtoA2)));
 
-        Assert.assertEquals(expectedEntity, dto.fromDto(dto, new ClassFWithCollection()));
+        Assert.assertEquals(expectedEntity, dto.fromDto(new ClassFWithCollection()));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class FromDtoMapperTest {
         ClassFWithInvalidCollectionDTO dto = new ClassFWithInvalidCollectionDTO(CLASS_F_ID, classACollection);
 
         try {
-            dto.fromDto(dto, new ClassFWithInvalidCollection());
+            dto.fromDto(new ClassFWithInvalidCollection());
             fail("Test should throw UnsupportedOperationException with message: \"<class name> holds a member that is a java.util.Collection other than java.util.List or java.util.Set.\"");
         } catch (UnsupportedOperationException e) {
             Assert.assertEquals("dto.ClassFWithInvalidCollectionDTO holds a member that is a java.util.Collection other than java.util.List or java.util.Set.", e.getMessage());
@@ -144,7 +144,7 @@ public class FromDtoMapperTest {
         ClassFWithMap expectedEntity = new ClassFWithMap(CLASS_F_ID, map1, map2, stringLongMap, map4);
         ClassFWithMapDTO dto = new ClassFWithMapDTO(CLASS_F_ID, map1DTO, map2DTO, stringLongMap, map4DTO);
 
-        Assert.assertEquals(expectedEntity, dto.fromDto(dto, new ClassFWithMap()));
+        Assert.assertEquals(expectedEntity, dto.fromDto(new ClassFWithMap()));
     }
 
     @Test
@@ -160,7 +160,7 @@ public class FromDtoMapperTest {
         ClassFWithArrayDTO dto = new ClassFWithArrayDTO(CLASS_F_ID, new ClassADTO[] {dtoA1, dtoA2},
                 new Long[] {666L, 777L}, new int[] {1});
 
-        Assert.assertEquals(expectedEntity, dto.fromDto(dto, new ClassFWithArray()));
+        Assert.assertEquals(expectedEntity, dto.fromDto(new ClassFWithArray()));
     }
 
     @Test
@@ -177,7 +177,7 @@ public class FromDtoMapperTest {
         ClassWithCycleDTO dto = new ClassWithCycleDTO(Arrays.asList(dtoG));
         dto.setIgnoredMember("Kiekeboe");
 
-        Assert.assertEquals(expectedEntity, dto.fromDto(dto, new ClassWithCycle()));
+        Assert.assertEquals(expectedEntity, dto.fromDto(new ClassWithCycle()));
 
     }
 
