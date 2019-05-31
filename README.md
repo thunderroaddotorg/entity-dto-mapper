@@ -47,8 +47,7 @@ To get a DTO from an entity bean the following code can be used:
 ```
     ...
     // entity is the entity bean that implements ToDtoMapper<SomeEntity,SomeDTO>
-    SomeDTO dto = new SomeDTO();
-    entity.toDto(entity, dto);
+    SomeDTO dto = entity.toDto(new SomeDTO());
     // do something with the dto object
     ...
 ```
@@ -75,8 +74,7 @@ To get an entity from a DTO bean the following code can be used:
 ```
     ...
     // dto is the DTO bean that implements FromDtoMapper<SomeEntity,SomeDTO>
-    SomeEntity entity = new SomeEntity();
-    dto.fromDto(dto, entity);
+    SomeEntity entity = dto.fromDto(new SomeEntity());
     // do something with the entity object
     ...
 ```
