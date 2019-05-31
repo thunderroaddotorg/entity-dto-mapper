@@ -35,7 +35,7 @@ public interface ToDtoMapper<T, DTO> {
      * @param entity the entity bean that needs to be converted. (Is at the same time the calling object)
      * @param dto the DTO bean that the entity will be converted into. (needs to be instantiated before)
      */
-    default void toDto(T entity, DTO dto) {
+    default DTO toDto(T entity, DTO dto) {
         BeanUtils.copyProperties(entity, dto);
 
         for (Field field : this.getClass().getDeclaredFields()) {
@@ -214,6 +214,7 @@ public interface ToDtoMapper<T, DTO> {
             }
         }
 
+        return dto;
     }
 
 }

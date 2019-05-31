@@ -35,7 +35,7 @@ public interface FromDtoMapper<T, DTO> {
      * @param dto the DTO bean that needs to be converted. (Is at the same time the calling object)
      * @param entity the entity bean that the entity will be converted into. (needs to be instantiated before)
      */
-    default void fromDto(DTO dto, T entity) {
+    default T fromDto(DTO dto, T entity) {
         BeanUtils.copyProperties(dto, entity);
         for (Field fieldDto : dto.getClass().getDeclaredFields()) {
             if (fieldDto.isAnnotationPresent(IgnoreMapping.class)) {
@@ -213,6 +213,7 @@ public interface FromDtoMapper<T, DTO> {
             }
         }
 
+        return entity;
     }
 
 }
