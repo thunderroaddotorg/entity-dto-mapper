@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
+import org.thunderroad.entitydtomapping.annotations.EntityDtoConverter;
 import org.thunderroad.entitydtomapping.annotations.IgnoreMapping;
 import org.thunderroad.entitydtomapping.annotations.Mapping;
+import org.thunderroad.entitydtomapping.converters.MappingConverter;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -57,6 +59,19 @@ public interface ToDtoMapper<T, DTO> {
     default DTO toDto(DTO dto) {
         BeanUtils.copyProperties(this, dto);
 
+        if (this.getClass().isAnnotationPresent(EntityDtoConverter.class)) {
+            Class<?> converterClass = this.getClass().getAnnotation(EntityDtoConverter.class).converter();
+            if (Arrays.stream(converterClass.getInterfaces()).collect(Collectors.toList()).contains(MappingConverter.class)) {
+
+                try {
+                    MappingConverter<T,DTO> converter = (MappingConverter<T,DTO>)converterClass.newInstance();
+                    return converter.convertToDto((T)this);
+                } catch (InstantiationException  | IllegalAccessException e) {
+                    logger.debug(e.getMessage(), e);
+                }
+            }
+        }
+
         for (Field field : this.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(IgnoreMapping.class)) {
                 continue;
@@ -69,155 +84,121 @@ public interface ToDtoMapper<T, DTO> {
                 if (Arrays.stream(field.getType().getInterfaces()).collect(Collectors.toList())
                         .contains(ToDtoMapper.class)) {
                     DTO newInstance = (DTO) pdSet.getPropertyType().newInstance();
-                    T obj = (T) pdGet.getReadMethod().invoke((T)this);
+                    T obj = (T) pdGet.getReadMethod().invoke((T) this);
                     pdSet.getWriteMethod().invoke(dto, ((ToDtoMapper<T, DTO>) obj).toDto(newInstance));
+                    continue;
                 } else if (field.isAnnotationPresent(Mapping.class)) {
-                    pdSet.getWriteMethod().invoke(dto, pdGet.getReadMethod().invoke((T)this));
+                    pdSet.getWriteMethod().invoke(dto, pdGet.getReadMethod().invoke((T) this));
                 }
 
-            } catch (IntrospectionException
-                    | IllegalAccessException
-                    | IllegalArgumentException
-                    | InvocationTargetException
-                    | InstantiationException e) {
-                logger.debug(e.getMessage(), e);
-            }
+                if (Arrays.stream(field.getType().getInterfaces()).collect(Collectors.toList()).contains(Collection.class)) {
 
-        }
+                    Field fieldDto = dto.getClass().getDeclaredField(mapping);
+                    pdGet = new PropertyDescriptor(field.getName(), this.getClass());
+                    pdSet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
+                    // calculate source and target type
+                    Type typeSource = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                    Type typeTarget = ((ParameterizedType) fieldDto.getGenericType()).getActualTypeArguments()[0];
 
-        for (Field field : Arrays.stream(this.getClass().getDeclaredFields())
-                .filter(field -> Arrays.stream(field.getType().getInterfaces()).collect(Collectors.toList())
-                        .contains(Collection.class)).collect(Collectors.toList())) {
+                    Collection<T> originalCollection = (Collection<T>) pdGet.getReadMethod().invoke((T) this);
+                    Collection<DTO> targetCollection = null;
+                    if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
+                            && List.class.equals(fieldDto.getType())
+                            && List.class.equals(field.getType())) {
+                        logger.debug("List entity");
+                        targetCollection = new ArrayList<>();
+                    } else if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
+                            && Set.class.equals(fieldDto.getType())
+                            && Set.class.equals(field.getType())) {
+                        logger.debug("Set entity");
+                        targetCollection = new HashSet<>();
+                    } else {
+                        throw new UnsupportedOperationException(this.getClass().getTypeName() + " holds a member that is a java.util.Collection other than java.util.List or java.util.Set.");
+                    }
+                    Assert.notNull(targetCollection, "Something went wrong while creating target collection. Only java.util.List and java.util.Set are supported!");
+                    for (T element : originalCollection) {
+                        DTO newInstance = (DTO) ((Class) typeTarget).newInstance();
+                        targetCollection.add(((ToDtoMapper<T, DTO>) element).toDto(newInstance));
+                    }
+                    pdSet.getWriteMethod().invoke(dto, targetCollection);
 
-            if (field.isAnnotationPresent(IgnoreMapping.class)) {
-                continue;
-            }
-            String mapping = field.isAnnotationPresent(Mapping.class) ? field.getAnnotation(Mapping.class).value() : field.getName();
-            try {
-                Field fieldDto = dto.getClass().getDeclaredField(mapping);
-                PropertyDescriptor pdGet = new PropertyDescriptor(field.getName(), this.getClass());
-                PropertyDescriptor pdSet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
-                // calculate source and target type
-                Type typeSource = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-                Type typeTarget = ((ParameterizedType) fieldDto.getGenericType()).getActualTypeArguments()[0];
-
-                Collection<T> originalCollection = (Collection<T>) pdGet.getReadMethod().invoke((T)this);
-                Collection<DTO> targetCollection = null;
-                if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
-                        && List.class.equals(fieldDto.getType())
-                        && List.class.equals(field.getType())) {
-                    logger.debug("List entity");
-                    targetCollection = new ArrayList<>();
-                } else if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
-                        && Set.class.equals(fieldDto.getType())
-                        && Set.class.equals(field.getType())) {
-                    logger.debug("Set entity");
-                    targetCollection = new HashSet<>();
-                } else {
-                    throw new UnsupportedOperationException(this.getClass().getTypeName() + " holds a member that is a java.util.Collection other than java.util.List or java.util.Set.");
-                }
-                Assert.notNull(targetCollection, "Something went wrong while creating target collection. Only java.util.List and java.util.Set are supported!");
-                for (T element : originalCollection) {
-                    DTO newInstance = (DTO) ((Class) typeTarget).newInstance();
-                    targetCollection.add(((ToDtoMapper<T, DTO>) element).toDto(newInstance));
-                }
-                pdSet.getWriteMethod().invoke(dto, targetCollection);
-            } catch (IntrospectionException
-                    | IllegalAccessException
-                    | IllegalArgumentException
-                    | InvocationTargetException
-                    | InstantiationException
-                    | NoSuchFieldException e) {
-                logger.debug(e.getMessage(), e);
-            }
-        }
-
-        for (Field field : Arrays.stream(this.getClass().getDeclaredFields())
-                .filter(field -> field.getType().equals(Map.class))
-                        .collect(Collectors.toList())) {
-
-            if (field.isAnnotationPresent(IgnoreMapping.class)) {
-                continue;
-            }
-            String mapping = field.isAnnotationPresent(Mapping.class) ? field.getAnnotation(Mapping.class).value() : field.getName();
-            try {
-                logger.debug("Map field " + field.getName());
-                Type keyTypeEntity = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
-                Type valueTypeEntity = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[1];
-
-                boolean srcMappedKeyType = Arrays.stream(((Class) keyTypeEntity).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class);
-                boolean srcMappedValueType = Arrays.stream(((Class) valueTypeEntity).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class);
-
-                if (!srcMappedKeyType && !srcMappedValueType) {
                     continue;
                 }
-                Field fieldDto = dto.getClass().getDeclaredField(mapping);
-                Type keyTypeDto = ((ParameterizedType)fieldDto.getGenericType()).getActualTypeArguments()[0];
-                Type valueTypeDto = ((ParameterizedType)fieldDto.getGenericType()).getActualTypeArguments()[1];
 
-                PropertyDescriptor pdGet = new PropertyDescriptor(field.getName(), this.getClass());
-                PropertyDescriptor pdSet = new PropertyDescriptor(mapping, dto.getClass());
+                if (field.getType().equals(Map.class)) {
 
-                Map srcMap = (Map)pdGet.getReadMethod().invoke((T)this);
-                Map targetMap = new HashMap<>();
-                Object key = null;
-                Object value = null;
-                for (Object entityKey : srcMap.keySet()) {
-                    if (srcMappedKeyType) {
-                        DTO keyDto = (DTO)((Class)keyTypeDto).newInstance();
-                        key =((ToDtoMapper<T,DTO>)entityKey).toDto(keyDto);
-                    } else {
-                        key = entityKey;
+                    logger.debug("Map field " + field.getName());
+                    Type keyTypeEntity = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                    Type valueTypeEntity = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[1];
+
+                    boolean srcMappedKeyType = Arrays.stream(((Class) keyTypeEntity).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class);
+                    boolean srcMappedValueType = Arrays.stream(((Class) valueTypeEntity).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class);
+
+                    if (!srcMappedKeyType && !srcMappedValueType) {
+                        continue;
                     }
-                    Object entityValue = srcMap.get(entityKey);
-                    if (srcMappedValueType) {
-                        DTO valueDto = (DTO)((Class)valueTypeDto).newInstance();
-                        value = ((ToDtoMapper<T,DTO>)entityValue).toDto(valueDto);
-                    } else {
-                        value = entityValue;
-                    }
-                    targetMap.put(key, value);
-                }
-                pdSet.getWriteMethod().invoke(dto, targetMap);
-
-            } catch (NoSuchFieldException
-                    | IntrospectionException
-                    | IllegalAccessException
-                    | InvocationTargetException
-                    | InstantiationException e) {
-                logger.debug(e.getMessage(), e);
-            }
-
-        }
-
-        for (Field field : Arrays.stream(this.getClass().getDeclaredFields())
-                .filter(field -> ((Class)field.getType()).isArray())
-                .collect(Collectors.toList())) {
-            String mapping = field.isAnnotationPresent(Mapping.class) ? field.getAnnotation(Mapping.class).value() : field.getName();
-            try {
-                String elementTypename = field.getType().getTypeName().substring(0, field.getType().getTypeName().length() - 2);
-                Class<?> elementTypeSrc = Class.forName(elementTypename);
-
-                if (Arrays.stream(elementTypeSrc.getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)) {
                     Field fieldDto = dto.getClass().getDeclaredField(mapping);
-                    String targetElementTypename = fieldDto.getType().getTypeName().substring(0, fieldDto.getType().getTypeName().length() - 2);
-                    Class<?> elementTypeTarget = Class.forName(targetElementTypename);
+                    Type keyTypeDto = ((ParameterizedType) fieldDto.getGenericType()).getActualTypeArguments()[0];
+                    Type valueTypeDto = ((ParameterizedType) fieldDto.getGenericType()).getActualTypeArguments()[1];
 
-                    PropertyDescriptor pdGet = new PropertyDescriptor(field.getName(), this.getClass());
-                    PropertyDescriptor pdSet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
+                    /*PropertyDescriptor*/
+                    pdGet = new PropertyDescriptor(field.getName(), this.getClass());
+                    /*PropertyDescriptor*/
+                    pdSet = new PropertyDescriptor(mapping, dto.getClass());
 
-                    Object srcObject = field.getType().cast(pdGet.getReadMethod().invoke((T)this));
-                    T[] srcArray = (T[]) srcObject;
-                    int length = srcArray.length;
-                    DTO[] targetArray = (DTO[])Array.newInstance(elementTypeTarget, length);
-                    for (int index = 0; index < length; index++) {
-                        DTO newinstance = (DTO)elementTypeTarget.newInstance();
-                        targetArray[index] = ((ToDtoMapper<T,DTO>)srcArray[index]).toDto(newinstance);
+                    Map srcMap = (Map) pdGet.getReadMethod().invoke((T) this);
+                    Map targetMap = new HashMap<>();
+                    Object key = null;
+                    Object value = null;
+                    for (Object entityKey : srcMap.keySet()) {
+                        if (srcMappedKeyType) {
+                            DTO keyDto = (DTO) ((Class) keyTypeDto).newInstance();
+                            key = ((ToDtoMapper<T, DTO>) entityKey).toDto(keyDto);
+                        } else {
+                            key = entityKey;
+                        }
+                        Object entityValue = srcMap.get(entityKey);
+                        if (srcMappedValueType) {
+                            DTO valueDto = (DTO) ((Class) valueTypeDto).newInstance();
+                            value = ((ToDtoMapper<T, DTO>) entityValue).toDto(valueDto);
+                        } else {
+                            value = entityValue;
+                        }
+                        targetMap.put(key, value);
                     }
-                    pdSet.getWriteMethod().invoke(dto, (Object) targetArray);
+                    pdSet.getWriteMethod().invoke(dto, targetMap);
 
+                    continue;
                 }
 
+                if (((Class) field.getType()).isArray()) {
+                    String elementTypename = field.getType().getTypeName().substring(0, field.getType().getTypeName().length() - 2);
+                    Class<?> elementTypeSrc = Class.forName(elementTypename);
+
+                    if (Arrays.stream(elementTypeSrc.getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)) {
+                        Field fieldDto = dto.getClass().getDeclaredField(mapping);
+                        String targetElementTypename = fieldDto.getType().getTypeName().substring(0, fieldDto.getType().getTypeName().length() - 2);
+                        Class<?> elementTypeTarget = Class.forName(targetElementTypename);
+
+                        /*PropertyDescriptor*/
+                        pdGet = new PropertyDescriptor(field.getName(), this.getClass());
+                        /*PropertyDescriptor*/
+                        pdSet = new PropertyDescriptor(fieldDto.getName(), dto.getClass());
+
+                        Object srcObject = field.getType().cast(pdGet.getReadMethod().invoke((T) this));
+                        T[] srcArray = (T[]) srcObject;
+                        int length = srcArray.length;
+                        DTO[] targetArray = (DTO[]) Array.newInstance(elementTypeTarget, length);
+                        for (int index = 0; index < length; index++) {
+                            DTO newinstance = (DTO) elementTypeTarget.newInstance();
+                            targetArray[index] = ((ToDtoMapper<T, DTO>) srcArray[index]).toDto(newinstance);
+                        }
+                        pdSet.getWriteMethod().invoke(dto, (Object) targetArray);
+
+                    }
+
+                    continue;
+                }
             } catch (ClassNotFoundException
                     | NoSuchFieldException
                     | IntrospectionException
