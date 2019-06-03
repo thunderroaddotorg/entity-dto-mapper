@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
-import org.thunderroad.entitydtomapping.annotaions.IgnoreMapping;
-import org.thunderroad.entitydtomapping.annotaions.Mapping;
+import org.thunderroad.entitydtomapping.annotations.IgnoreMapping;
+import org.thunderroad.entitydtomapping.annotations.Mapping;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;

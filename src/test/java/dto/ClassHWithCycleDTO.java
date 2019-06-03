@@ -2,7 +2,7 @@ package dto;
 
 import entity.ClassHWithCycle;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
-import org.thunderroad.entitydtomapping.annotaions.Mapping;
+import org.thunderroad.entitydtomapping.annotations.Mapping;
 
 import java.util.Objects;
 

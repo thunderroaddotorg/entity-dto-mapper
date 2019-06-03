@@ -1,4 +1,4 @@
-package org.thunderroad.entitydtomapping.annotaions;
+package org.thunderroad.entitydtomapping.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

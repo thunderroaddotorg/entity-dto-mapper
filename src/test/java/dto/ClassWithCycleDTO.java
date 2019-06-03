@@ -2,8 +2,8 @@ package dto;
 
 import entity.ClassWithCycle;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
-import org.thunderroad.entitydtomapping.annotaions.IgnoreMapping;
-import org.thunderroad.entitydtomapping.annotaions.Mapping;
+import org.thunderroad.entitydtomapping.annotations.IgnoreMapping;
+import org.thunderroad.entitydtomapping.annotations.Mapping;
 
 import java.util.List;
 import java.util.Objects;
