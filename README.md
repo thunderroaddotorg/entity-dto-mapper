@@ -40,6 +40,7 @@ Some prerequisites:
   * the classes SomeEntity and SomeDTO need to have a default constructor.
   * if the field names differ in the entity bean and the dto, they can be mapped with the @Mapping annotation (in both directions).
   * if a field does not have a mirrored member and does not need to be converted, this can be indicated with the @IgnoreMapping annotation.
+  * if the entity bean and DTO bean are not mirrored, one can create a converter class (by implementing the interface MappingConverter) and connect it to both the entity and the DTO bean with the annotation @EntityDtoConverter. (example in unit test)
 
 2.Execute the conversion in the code. 
 
@@ -67,6 +68,7 @@ Some prerequisites:
   * the classes SomeEntity and SomeDTO need to have a default constructor.
   * if the field names differ in the entity bean and the dto, they can be mapped with the @Mapping annotation (in both directions).
   * if a field does not have a mirrored member and does not need to be converted, this can be indicated with the @IgnoreMapping annotation.
+  * if the entity bean and DTO bean are not mirrored, one can create a converter class (by implementing the interface MappingConverter) and connect it to both the entity and the DTO bean with the annotation @EntityDtoConverter. (example in unit test)
 
 2.Execute the conversion in the code. 
 
