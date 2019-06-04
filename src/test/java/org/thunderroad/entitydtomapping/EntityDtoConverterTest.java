@@ -1,8 +1,10 @@
 package org.thunderroad.entitydtomapping;
 
 import dto.ClassWithAddressDTO;
+import dto.ClassWithPersonDTO;
 import entity.Address;
 import entity.ClassWithAddress;
+import entity.ClassWithPerson;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,5 +48,24 @@ public class EntityDtoConverterTest {
     @Test
     public void toEntityClassWithAddress() {
         Assert.assertEquals(entity, dto.fromDto(new ClassWithAddress()));
+    }
+
+    @Test
+    public void toDtoClassWithPerson() {
+
+        ClassWithPerson person = new ClassWithPerson(1L, "Marcel Kiekeboe", entity);
+        ClassWithPersonDTO personDTO = new ClassWithPersonDTO(1L, "Marcel Kiekeboe", dto);
+
+        Assert.assertEquals(personDTO, person.toDto(new ClassWithPersonDTO()));
+    }
+
+    @Test
+    public void toEntityClassWithPerson() {
+
+        ClassWithPerson person = new ClassWithPerson(1L, "Marcel Kiekeboe", entity);
+        ClassWithPersonDTO personDTO = new ClassWithPersonDTO(1L, "Marcel Kiekeboe", dto);
+
+        Assert.assertEquals(person, personDTO.fromDto(new ClassWithPerson()));
+
     }
 }
