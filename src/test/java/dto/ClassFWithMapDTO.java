@@ -1,6 +1,8 @@
 package dto;
 
 import entity.ClassFWithMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 import java.util.Date;
@@ -95,5 +97,10 @@ public class ClassFWithMapDTO extends AbstractClassDDTO implements FromDtoMapper
                 + getMembersMap3().hashCode()
                 + getMembersMap4().hashCode();
         return result;
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

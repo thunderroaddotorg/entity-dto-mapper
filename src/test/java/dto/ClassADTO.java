@@ -1,6 +1,8 @@
 package dto;
 
 import entity.ClassA;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 import java.util.Date;
@@ -79,5 +81,10 @@ public class ClassADTO implements FromDtoMapper<ClassA, ClassADTO> {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, dateMember, objMember);
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

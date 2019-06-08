@@ -1,6 +1,8 @@
 package dto;
 
 import entity.EffectiveClassE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 public class EffectiveClassEDTO extends AbstractClassDDTO implements FromDtoMapper<EffectiveClassE, EffectiveClassEDTO> {
@@ -48,4 +50,8 @@ public class EffectiveClassEDTO extends AbstractClassDDTO implements FromDtoMapp
         return result;
     }
 
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
+    }
 }

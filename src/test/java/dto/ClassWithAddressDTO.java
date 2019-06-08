@@ -2,6 +2,8 @@ package dto;
 
 import converter.ClassWithAddressConverter;
 import entity.ClassWithAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 import org.thunderroad.entitydtomapping.annotations.EntityDtoConverter;
 
@@ -82,5 +84,10 @@ public class ClassWithAddressDTO implements FromDtoMapper<ClassWithAddress,Class
                 ", city='" + city + '\'' +
                 ", country='" + country + '\'' +
                 '}';
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

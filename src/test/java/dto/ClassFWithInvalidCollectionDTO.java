@@ -1,11 +1,14 @@
 package dto;
 
 import entity.ClassFWithInvalidCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 import java.util.Queue;
 
-public class ClassFWithInvalidCollectionDTO extends AbstractClassDDTO implements FromDtoMapper<ClassFWithInvalidCollection, ClassFWithInvalidCollectionDTO> {
+public class ClassFWithInvalidCollectionDTO extends AbstractClassDDTO
+        implements FromDtoMapper<ClassFWithInvalidCollection, ClassFWithInvalidCollectionDTO> {
 
     private Queue<ClassADTO> members;
 
@@ -50,5 +53,10 @@ public class ClassFWithInvalidCollectionDTO extends AbstractClassDDTO implements
         int result = super.hashCode();
         result = 31 * result + getMembers().hashCode();
         return result;
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

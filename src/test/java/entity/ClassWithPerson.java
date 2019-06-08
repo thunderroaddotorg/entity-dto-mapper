@@ -1,6 +1,8 @@
 package entity;
 
 import dto.ClassWithPersonDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.ToDtoMapper;
 
 import java.util.Objects;
@@ -66,5 +68,10 @@ public class ClassWithPerson implements ToDtoMapper<ClassWithPerson, ClassWithPe
                 ", name='" + name + '\'' +
                 ", address=" + address +
                 '}';
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

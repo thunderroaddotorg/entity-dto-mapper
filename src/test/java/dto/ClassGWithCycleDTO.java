@@ -1,6 +1,8 @@
 package dto;
 
 import entity.ClassGWithCycle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 import java.util.List;
@@ -57,5 +59,10 @@ public class ClassGWithCycleDTO extends AbstractClassDDTO implements FromDtoMapp
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), name, membersH);
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

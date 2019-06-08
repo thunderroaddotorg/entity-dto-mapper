@@ -1,6 +1,8 @@
 package entity;
 
 import dto.ClassWithCycleDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.ToDtoMapper;
 import org.thunderroad.entitydtomapping.annotations.Mapping;
 
@@ -45,5 +47,10 @@ public class ClassWithCycle implements ToDtoMapper<ClassWithCycle, ClassWithCycl
     @Override
     public int hashCode() {
         return Objects.hash(members);
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

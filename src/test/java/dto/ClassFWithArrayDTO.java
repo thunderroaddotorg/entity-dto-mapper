@@ -1,6 +1,8 @@
 package dto;
 
 import entity.ClassFWithArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 import java.util.Arrays;
@@ -80,5 +82,10 @@ public class ClassFWithArrayDTO extends AbstractClassDDTO implements FromDtoMapp
                 + getMembersArray2().hashCode()
                 + getMembersArray3().hashCode();
         return result;
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

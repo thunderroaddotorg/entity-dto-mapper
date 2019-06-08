@@ -1,6 +1,8 @@
 package entity;
 
 import dto.ClassADTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.ToDtoMapper;
 
 import java.util.Date;
@@ -79,5 +81,10 @@ public class ClassA implements ToDtoMapper<ClassA, ClassADTO> {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, dateMember, objMember);
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

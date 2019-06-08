@@ -1,6 +1,8 @@
 package dto;
 
 import entity.ClassB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 import java.util.Objects;
@@ -54,5 +56,10 @@ public class ClassBDTO implements FromDtoMapper<ClassB, ClassBDTO> {
     @Override
     public int hashCode() {
         return Objects.hash(id, classA);
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

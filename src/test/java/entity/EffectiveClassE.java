@@ -1,6 +1,8 @@
 package entity;
 
 import dto.EffectiveClassEDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.ToDtoMapper;
 
 public class EffectiveClassE extends AbstractClassD implements ToDtoMapper<EffectiveClassE, EffectiveClassEDTO> {
@@ -46,5 +48,10 @@ public class EffectiveClassE extends AbstractClassD implements ToDtoMapper<Effec
         int result = super.hashCode();
         result = 31 * result + nameMember.hashCode();
         return result;
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

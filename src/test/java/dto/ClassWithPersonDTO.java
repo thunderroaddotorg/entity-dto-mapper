@@ -1,6 +1,8 @@
 package dto;
 
 import entity.ClassWithPerson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.FromDtoMapper;
 
 import java.util.Objects;
@@ -66,5 +68,10 @@ public class ClassWithPersonDTO implements FromDtoMapper<ClassWithPerson,ClassWi
                 ", name='" + name + '\'' +
                 ", address=" + address +
                 '}';
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }

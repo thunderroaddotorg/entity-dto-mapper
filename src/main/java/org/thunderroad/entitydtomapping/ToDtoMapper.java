@@ -1,7 +1,6 @@
 package org.thunderroad.entitydtomapping;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 import org.thunderroad.entitydtomapping.annotations.EntityDtoConverter;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
  */
 public interface ToDtoMapper<T, DTO> {
 
-    Logger logger = LoggerFactory.getLogger(ToDtoMapper.class);
+    Logger logger();
 
     /**
      * Conversion method to convert the entity bean into the DTO bean that represents it.
@@ -67,7 +66,7 @@ public interface ToDtoMapper<T, DTO> {
                     MappingConverter<T,DTO> converter = (MappingConverter<T,DTO>)converterClass.newInstance();
                     return converter.convertToDto((T)this);
                 } catch (InstantiationException  | IllegalAccessException e) {
-                    logger.debug(e.getMessage(), e);
+                    logger().debug(e.getMessage(), e);
                 }
             }
         }
@@ -105,12 +104,12 @@ public interface ToDtoMapper<T, DTO> {
                     if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
                             && List.class.equals(fieldDto.getType())
                             && List.class.equals(field.getType())) {
-                        logger.debug("List entity");
+                        logger().debug("List entity");
                         targetCollection = new ArrayList<>();
                     } else if (Arrays.stream(((Class) typeSource).getInterfaces()).collect(Collectors.toList()).contains(ToDtoMapper.class)
                             && Set.class.equals(fieldDto.getType())
                             && Set.class.equals(field.getType())) {
-                        logger.debug("Set entity");
+                        logger().debug("Set entity");
                         targetCollection = new HashSet<>();
                     } else {
                         throw new UnsupportedOperationException(this.getClass().getTypeName() + " holds a member that is a java.util.Collection other than java.util.List or java.util.Set.");
@@ -127,7 +126,7 @@ public interface ToDtoMapper<T, DTO> {
 
                 if (field.getType().equals(Map.class)) {
 
-                    logger.debug("Map field " + field.getName());
+                    if (logger().isDebugEnabled()) logger().debug(String.format("Map field %s", field.getName()));
                     Type keyTypeEntity = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
                     Type valueTypeEntity = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[1];
 
@@ -196,8 +195,6 @@ public interface ToDtoMapper<T, DTO> {
                         pdSet.getWriteMethod().invoke(dto, (Object) targetArray);
 
                     }
-
-                    continue;
                 }
             } catch (ClassNotFoundException
                     | NoSuchFieldException
@@ -205,7 +202,7 @@ public interface ToDtoMapper<T, DTO> {
                     | IllegalAccessException
                     | InvocationTargetException
                     | InstantiationException e) {
-                logger.debug(e.getMessage(), e);
+                logger().debug(e.getMessage(), e);
             }
         }
 

@@ -1,6 +1,8 @@
 package entity;
 
 import dto.ClassFWithCollectionDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thunderroad.entitydtomapping.ToDtoMapper;
 
 import java.util.List;
@@ -62,5 +64,10 @@ public class ClassFWithCollection extends AbstractClassD implements ToDtoMapper<
         int result = super.hashCode();
         result = 31 * result + getMembersList().hashCode() + getMembersSet().hashCode();
         return result;
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(this.getClass());
     }
 }
